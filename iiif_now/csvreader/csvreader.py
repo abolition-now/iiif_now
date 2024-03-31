@@ -37,11 +37,12 @@ class DataReader:
         Build a hierarchy of canvases based on the parent field in the CSV
 
         Returns:
-            dict: A dictionary of canvases organized by parent
+            list: A list of dictionaries of canvases organized by parent
 
         Example:
-            {
-              '0001_newbeginnings': {
+            [
+              {
+                'id': '0001_newbeginnings',
                 'canvases': [
                    {'label': 'Original Image', 'sequence': '1', 'parent': '0001_newbeginnings', 'type': 'Image', 'thumbnail': '0001_newbeginnings_oo.jpg', 'metadata': {}, 'artists': ['Ricardo Levins Morales']},
                    {'label': 'Reuse', 'sequence': '2', 'parent': '0001_newbeginnings', 'type': 'Image', 'thumbnail': '0001_newbeginnings_ru.png', 'metadata': {'Visual Motif': ['Butterflies']}, 'artists': ['Ricardo Levins Morales']}
@@ -50,30 +51,35 @@ class DataReader:
                 'artists': ['Ricardo Levins Morales'],
                 'metadata': {'Visual Motif': ['Butterflies']}
               }
-            }
+            ]
         """
-        hierarchy = {}
+        hierarchy = []
         for row in self.relevant_rows:
-            if row['parent'] not in hierarchy:
-                hierarchy[row['parent']] = {
+            canvas_id = row['parent']
+            canvas_dict = next((item for item in hierarchy if item['id'] == canvas_id), None)
+            if canvas_dict is None:
+                canvas_dict = {
+                    'id': canvas_id,
                     'canvases': [],
                     'manifest_title': '',
                     'artists': [],
                     'metadata': {}
                 }
+                hierarchy.append(canvas_dict)
+
             canvas = DataCanvas(row, self.artists, self.metadata)
             if canvas.parent_title != '':
-                hierarchy[row['parent']]['manifest_title'] = canvas.parent_title
-            hierarchy[row['parent']]['canvases'].append(canvas.as_dict)
+                canvas_dict['manifest_title'] = canvas.parent_title
+            canvas_dict['canvases'].append(canvas.as_dict)
             for artist in canvas.artists:
-                if artist not in hierarchy[row['parent']]['artists']:
-                    hierarchy[row['parent']]['artists'].append(artist)
+                if artist not in canvas_dict['artists']:
+                    canvas_dict['artists'].append(artist)
             if canvas.metadata:
                 for k, v in canvas.metadata.items():
-                    if k not in hierarchy[row['parent']]['metadata']:
-                        hierarchy[row['parent']]['metadata'][k] = v
+                    if k not in canvas_dict['metadata']:
+                        canvas_dict['metadata'][k] = v
                     else:
-                        hierarchy[row['parent']]['metadata'][k].extend(v)
+                        canvas_dict['metadata'][k].extend(v)
         return hierarchy
 
     @staticmethod
@@ -96,4 +102,4 @@ if __name__ == '__main__':
     x = reader.build_hierarchy()
     # for manifest, v in x.items():
     #     print(v['metadata'])
-    print(x['0001_newbeginnings'])
+    print(len(x[0]['canvases']))

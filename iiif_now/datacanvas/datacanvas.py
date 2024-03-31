@@ -6,7 +6,7 @@ class DataCanvas:
         self.artists_data = artists_data
         self.metadata_data = metadata_data
         self.artists = self.__find_canvas_artists()
-        self.__build_metadata()
+        self.metadata = self.__build_metadata()
 
     def __find_canvas_artists(self):
         artists = []
@@ -19,6 +19,7 @@ class DataCanvas:
     def __build_metadata(self):
         metadata = {}
         for k, v in self.canvas_data.items():
-            if k.startswith('code_') and v != '':
-                metadata[k] = self.metadata_data[k]
-        return
+            if k.startswith('code_') and v and v in self.metadata_data:
+                field = self.metadata_data[v]
+                metadata.setdefault(field, []).append(v)
+        return metadata

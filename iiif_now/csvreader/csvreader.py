@@ -26,13 +26,10 @@ class DataReader:
         with open(metadata_sheet) as f:
             reader = DictReader(f)
             metadata = {}
-            for key in reader.fieldnames:
-                metadata[key] = []
             for row in reader:
-                for key in row:
-                    if row[key] != '':
-                        metadata[key].append(row[key])
-        print(metadata)
+                for k, v in row.items():
+                    if v != '':
+                        metadata[v] = k
         return metadata
 
     def build_hierarchy(self):
@@ -44,7 +41,7 @@ class DataReader:
                     'manifest_title': '',
                     'artists': []
                 }
-            #canvas = DataCanvas(row, self.artists, self.metadata)
+            canvas = DataCanvas(row, self.artists, self.metadata)
         return hierarchy
 
     @staticmethod

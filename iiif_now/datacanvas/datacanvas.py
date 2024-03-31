@@ -12,6 +12,8 @@ class DataCanvas:
         self.parent = self.canvas_data['parent']
         self.type = self.canvas_data['type']
         self.thumbnail = self.__find_thumbnail_source()
+        self.parent_title = self.canvas_data['title']
+        self.as_dict = self.__build_dict()
 
     def __find_canvas_artists(self):
         artists = []
@@ -34,3 +36,14 @@ class DataCanvas:
             return self.canvas_data['thumbnail source']
         else:
             return self.canvas_data['key']
+
+    def __build_dict(self):
+        return {
+            'label': self.label,
+            'sequence': self.sequence,
+            'parent': self.parent,
+            'type': self.type,
+            'thumbnail': self.thumbnail,
+            'metadata': self.metadata,
+            'artists': self.artists
+        }

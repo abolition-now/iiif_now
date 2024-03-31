@@ -18,12 +18,14 @@ class ANManifest:
             label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
             metadata=self.metadata
         )
-        # canvas = manifest.make_canvas_from_iiif(
-        #     url=self.metadata['image_api'],
-        #     id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{self.metadata['key']}/canvas/1",
-        #     anno_id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{self.metadata['key']}/canvas/1/annotation/1",
-        #     anno_page_id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{self.metadata['key']}/canvas/1/annotation/1/page/1",
-        # )
+        for canvas in self.manifest_data['canvases']:
+            if canvas['type'] == 'Image':
+                canvas = manifest.make_canvas_from_iiif(
+                    url=self.metadata['image_api'],
+                    id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{canvas['key']}/canvas/{canvas['sequence']}",
+                    anno_id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{canvas['key']}/canvas/{canvas['sequence']}/annotation/1",
+                    anno_page_id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{canvas['key']}/canvas/{canvas['sequence']}/annotation/1/page/1",
+                )
         x = manifest.json(indent=2)
         y = json.loads(x)
         y['@context'] = ["http://iiif.io/api/extension/navplace/context.json", "http://iiif.io/api/presentation/3/context.json"]

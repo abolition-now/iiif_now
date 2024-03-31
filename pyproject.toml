@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "iiif-now"
+version = "0.1.0"
+description = "IIIF Manifest Generator for Abolition Now project"
+authors = ["Mark Baggett <mbagget1@utk.edu>"]
+license = "WTFPL"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.31.0"
+iiif-prezi3 = "^1.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

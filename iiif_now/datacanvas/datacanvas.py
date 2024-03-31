@@ -45,5 +45,6 @@ class DataCanvas:
             'type': self.type,
             'thumbnail': self.thumbnail,
             'metadata': self.metadata,
-            'artists': self.artists
+            'artists': self.artists,
+            'key': self.canvas_data['key']
         }

@@ -25,6 +25,7 @@ class ANManifest:
         )
 
     def __build_manifest(self):
+        # @Todo: Don't forget thumbnails or canopy nav doesn't work
         manifest = Manifest(
             id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
             label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
@@ -40,9 +41,8 @@ class ANManifest:
                         anno_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1",
                         anno_page_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1/page/1",
                     )
-                # @Todo: Accurately Define Exception
-                except:
-                    print(f'Missing {self.image_server_path}{canvas["key"]} in bucket.')
+                except requests.HTTPError as e:
+                    print(f'{e}. Missing file in bucket or other image server problem.')
             elif canvas['type'] == 'Video':
                 # try:
                 vid_canvas = manifest.make_canvas(

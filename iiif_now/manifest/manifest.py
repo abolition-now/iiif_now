@@ -1,13 +1,22 @@
-from iiif_prezi3 import Manifest, config, KeyValueString, load_bundled_extensions
+from iiif_prezi3 import Manifest, config, KeyValueString, load_bundled_extensions, AnnotationPage, Annotation, ResourceItem
 import requests
 import json
 
 
 class ANManifest:
     # @Todo: Add navPlace
-    # @Todo: Add Video Canvases
-    def __init__(self, manifest_data, extensions=[]):
+    def __init__(
+            self,
+            manifest_data,
+            image_server_path="https://strob6zro3bzklrulaqu2545sy0odbvz.lambda-url.us-east-2.on.aws/iiif/3/",
+            video_location="https://digital.lib.utk.edu/static/",
+            manifest_bucket="https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/",
+            extensions=[]
+    ):
         self.config = config.configs['helpers.auto_fields.AutoLang'].auto_lang = "en"
+        self.image_server_path = image_server_path
+        self.manifest_bucket = manifest_bucket
+        self.video_location = video_location
         self.manifest_data = manifest_data
         self.metadata = self.__build_metadata()
         self.manifest = self.__build_manifest()
@@ -24,23 +33,31 @@ class ANManifest:
         for canvas in self.manifest_data['canvases']:
             if canvas['type'] == 'Image':
                 try:
-                    # @Todo: Break Bucket Identifiers Out of Code
-                    canvas = manifest.make_canvas_from_iiif(
-                        url=f"https://strob6zro3bzklrulaqu2545sy0odbvz.lambda-url.us-east-2.on.aws/iiif/3/{canvas['key']}",
-                        id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{canvas['key']}/canvas/{canvas['sequence']}",
-                        anno_id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{canvas['key']}/canvas/{canvas['sequence']}/annotation/1",
-                        anno_page_id=f"https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/{canvas['key']}/canvas/{canvas['sequence']}/annotation/1/page/1",
+                    # @Todo: Protect anno page and annotation
+                    manifest.make_canvas_from_iiif(
+                        url=f"{self.image_server_path}{canvas['key']}",
+                        id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
+                        anno_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1",
+                        anno_page_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1/page/1",
                     )
                 # @Todo: Accurately Define Exception
                 except:
-                    print(f'Missing {canvas["key"]} in bucket.')
+                    print(f'Missing {self.image_server_path}{canvas["key"]} in bucket.')
+            elif canvas['type'] == 'Video':
+                # try:
+                vid_canvas = manifest.make_canvas(
+                    id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
+                )
+                details = self.__create_video_canvas(
+                    canvas=vid_canvas,
+                    canvas_data= canvas
+                )
+                vid_canvas.set_hwd(**details[1])
+                vid_canvas.add_item(details[0])
         x = manifest.json(indent=2)
-        y = json.loads(x)
-        y['@context'] = ["http://iiif.io/api/extension/navplace/context.json", "http://iiif.io/api/presentation/3/context.json"]
-        # @Todo: Write Manifests in Separate Method
-        # with open(f'data/new_copy/{self.metadata["key"]}.json', 'w') as outfile:
-        #     outfile.write(json.dumps(y, indent=2))
-        return manifest.json(indent=2)
+        manifest_as_json = json.loads(x)
+        manifest_as_json['@context'] = ["http://iiif.io/api/extension/navplace/context.json", "http://iiif.io/api/presentation/3/context.json"]
+        return manifest_as_json
 
     def __build_metadata(self):
         metadata = []
@@ -53,17 +70,44 @@ class ANManifest:
             )
         return metadata
 
+    def write(self, path):
+        with open(f'{path}/{self.manifest_data["id"]}.json', 'w') as outfile:
+            outfile.write(
+                json.dumps(
+                    self.manifest, indent=2)
+            )
+
+    def __create_video_canvas(self, canvas, canvas_data):
+        anno_body = ResourceItem(
+            id=f"{self.video_location}{canvas_data['key']}",
+            type="Video",
+            format="video/mp4"
+        )
+        anno_page = AnnotationPage(
+            id=f"{self.manifest_bucket}{canvas_data['key']}/canvas/{canvas_data['sequence']}/annotation/1/page/1"
+        )
+        anno = Annotation(
+            id=f"{self.manifest_bucket}{canvas_data['key']}/canvas/{canvas_data['sequence']}/annotation/1",
+            motivation="painting",
+            body=anno_body,
+            target=canvas.id
+        )
+        hwd = {"height": 360, "width": 480, "duration": canvas_data['duration']}
+        anno_body.set_hwd(**hwd)
+        anno_page.add_item(anno)
+        return anno_page, hwd
+
 
 if __name__ == "__main__":
     # Note: This is all temporary until parent package is complete.
     from iiif_now.csvreader import DataReader
     # @Todo: All of this should happen elsewhere. Bring in configuration first then fix.
     reader = DataReader(
-        'data/march302024.csv',
+        'data/april1.csv',
         artists_file='data/artists_codes.csv',
         metadata_file='data/new_codes.csv'
     )
     manifests = reader.build_hierarchy()
     for manifest in manifests:
-        x = ANManifest(manifest, [])
-        print(x.manifest)
+        x = ANManifest(manifest)
+        x.write('data/test_manifests')

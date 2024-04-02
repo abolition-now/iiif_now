@@ -22,6 +22,7 @@ manifest_directory:  'path_to_where_you_want_manifests_to_go'
 image_server_path: "https://strob6zro3bzklrulaqu2545sy0odbvz.lambda-url.us-east-2.on.aws/iiif/3/" # This is our default Image Server as of April 2, 2024.
 video_location: "https://digital.lib.utk.edu/static/" # This is our default video location as of April 2, 2024. It will move in the future.
 manifest_bucket: "https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/" # This is a unique pattern for naming canvases. It should not be dereferenceable. 404 preferred.
+extensions: ["extensions/navPlace.json"] # Path to navPlace extension
 ```
 
 ## Usage

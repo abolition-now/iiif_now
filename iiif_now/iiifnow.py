@@ -25,8 +25,9 @@ def use(config: str) -> None:
             manifest,
             image_server_path=settings['image_server_path'],
             video_location=settings['video_location'],
-            manifest_bucket=settings['manifest_bucket']
+            manifest_bucket=settings['manifest_bucket'],
+            extensions=settings['extensions']
         )
         x.write(
             settings['manifest_directory']
-    )
+        )

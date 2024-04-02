@@ -1,6 +1,7 @@
 from iiif_prezi3 import Manifest, config, KeyValueString, load_bundled_extensions, AnnotationPage, Annotation, ResourceItem
 import requests
 import json
+from iiif_now.navplace import NavPlace
 
 
 class ANManifest:
@@ -19,17 +20,32 @@ class ANManifest:
         self.video_location = video_location
         self.manifest_data = manifest_data
         self.metadata = self.__build_metadata()
+        self.features = self.__find_features()
         self.manifest = self.__build_manifest()
         self.extensions = load_bundled_extensions(
             extensions=extensions
         )
 
     def __build_manifest(self):
-        manifest = Manifest(
-            id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
-            label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
-            metadata=self.metadata
-        )
+        if self.features:
+            navplace_data = NavPlace(
+                self.features,
+                self.manifest_bucket,
+                self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled"
+            ).features
+            manifest = Manifest(
+                id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
+                label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
+                metadata=self.metadata,
+                navPlace={"features": navplace_data}
+            )
+        else:
+            manifest = Manifest(
+                id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
+                label=self.manifest_data['manifest_title'] if self.manifest_data[
+                                                                  'manifest_title'] != "" else "Untitled",
+                metadata=self.metadata
+            )
         for canvas in self.manifest_data['canvases']:
             if canvas['type'] == 'Image':
                 try:
@@ -60,6 +76,15 @@ class ANManifest:
         manifest_as_json['@context'] = ["http://iiif.io/api/extension/navplace/context.json", "http://iiif.io/api/presentation/3/context.json"]
         return manifest_as_json
 
+
+    def __find_features(self):
+        all_features = []
+        for k, v in self.manifest_data['metadata'].items():
+            if k == 'Geography':
+                for feature in v:
+                    all_features.append(feature)
+        return all_features
+
     def __build_metadata(self):
         metadata = []
         for k, v in self.manifest_data['metadata'].items():
@@ -86,6 +111,7 @@ class ANManifest:
             )
 
     def __create_video_canvas(self, canvas, canvas_data):
+        # @Todo: Check for video file like we do for images.
         anno_body = ResourceItem(
             id=f"{self.video_location}{canvas_data['key']}",
             type="Video",

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iiif-now"
-version = "0.1.1"
+version = "0.1.2"
 description = "IIIF Manifest Generator for Abolition Now project"
 authors = ["Mark Baggett <mbagget1@utk.edu>"]
 license = "WTFPL"

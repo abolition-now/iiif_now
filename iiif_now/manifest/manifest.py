@@ -25,7 +25,8 @@ class ANManifest:
         )
 
     def __build_manifest(self):
-        # @Todo: Don't forget thumbnails or canopy nav doesn't work
+        # @Todo: Don't forget thumbnails and labels or canopy nav doesn't work
+        # @Todo: Shuffle canvases based on Sequence
         manifest = Manifest(
             id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
             label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
@@ -37,6 +38,7 @@ class ANManifest:
                     # @Todo: Protect anno page and annotation
                     manifest.make_canvas_from_iiif(
                         url=f"{self.image_server_path}{canvas['key']}",
+                        label=canvas['label'] if canvas['label'] != "" else "Untitled",
                         id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
                         anno_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1",
                         anno_page_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1/page/1",
@@ -47,6 +49,7 @@ class ANManifest:
                 # try:
                 vid_canvas = manifest.make_canvas(
                     id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
+                    label=canvas['label'] if canvas['label'] != "" else "Untitled",
                 )
                 details = self.__create_video_canvas(
                     canvas=vid_canvas,
@@ -66,6 +69,13 @@ class ANManifest:
                 KeyValueString(
                     label=k,
                     value={"en": v}
+                )
+            )
+        if not metadata:
+            metadata.append(
+                KeyValueString(
+                    label="Missing metadata?",
+                    value={"en": ["Yes"]}
                 )
             )
         return metadata

@@ -7,7 +7,7 @@ IIIF Manifest generation tools for the Abolition Now project.
 ## Installation
 
 ```bash
-pip install iiif_now
+pip install iiif-now
 ```
 
 ## Configuration

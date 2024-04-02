@@ -12,6 +12,7 @@ requests = "^2.31.0"
 iiif-prezi3 = "^1.2.1"
 pyyaml = "^6.0.1"
 click = "^8.1.7"
+tqdm = "^4.66.2"
 
 [tool.poetry.scripts]
 iiifnow = "iiif_now.iiifnow:cli"

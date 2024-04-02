@@ -4,6 +4,7 @@ from iiif_now.csvreader import DataReader
 from iiif_now.manifest import ANManifest
 import click
 import yaml
+from tqdm import tqdm
 
 @click.group()
 def cli() -> None:
@@ -19,7 +20,7 @@ def use(config: str) -> None:
         metadata_file=settings['metadata_codes']
     )
     manifests = reader.build_hierarchy()
-    for manifest in manifests:
+    for manifest in tqdm(manifests):
         x = ANManifest(
             manifest,
             image_server_path=settings['image_server_path'],

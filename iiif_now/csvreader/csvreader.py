@@ -80,7 +80,10 @@ class DataReader:
                         canvas_dict['metadata'][k] = v
                     else:
                         canvas_dict['metadata'][k].extend(v)
+        for canvas_dict in hierarchy:
+            canvas_dict['canvases'] = sorted(canvas_dict['canvases'], key=lambda x: int(x['sequence']))
         return hierarchy
+
 
     @staticmethod
     def __read(csv_file):
@@ -91,15 +94,3 @@ class DataReader:
                 if row.get('parent') != "":
                     relevant_rows.append(row)
         return relevant_rows
-
-
-if __name__ == '__main__':
-    reader = DataReader(
-        'data/march302024.csv',
-        artists_file='data/artists_codes.csv',
-        metadata_file='data/new_codes.csv'
-    )
-    x = reader.build_hierarchy()
-    # for manifest, v in x.items():
-    #     print(v['metadata'])
-    print(len(x[0]['canvases']))

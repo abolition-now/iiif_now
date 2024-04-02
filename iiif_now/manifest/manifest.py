@@ -25,8 +25,6 @@ class ANManifest:
         )
 
     def __build_manifest(self):
-        # @Todo: Don't forget thumbnails and labels or canopy nav doesn't work
-        # @Todo: Shuffle canvases based on Sequence
         manifest = Manifest(
             id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
             label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
@@ -106,18 +104,3 @@ class ANManifest:
         anno_body.set_hwd(**hwd)
         anno_page.add_item(anno)
         return anno_page, hwd
-
-
-if __name__ == "__main__":
-    # Note: This is all temporary until parent package is complete.
-    from iiif_now.csvreader import DataReader
-    # @Todo: All of this should happen elsewhere. Bring in configuration first then fix.
-    reader = DataReader(
-        'data/april1.csv',
-        artists_file='data/artists_codes.csv',
-        metadata_file='data/new_codes.csv'
-    )
-    manifests = reader.build_hierarchy()
-    for manifest in manifests:
-        x = ANManifest(manifest)
-        x.write('data/test_manifests')

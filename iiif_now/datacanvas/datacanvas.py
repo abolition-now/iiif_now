@@ -8,12 +8,19 @@ class DataCanvas:
         self.artists = self.__find_canvas_artists()
         self.metadata = self.__build_metadata()
         self.label = self.canvas_data['canvas title']
-        self.sequence = self.canvas_data['sequence']
+        self.sequence = self.get_sequence(self.canvas_data['sequence'])
         self.parent = self.canvas_data['parent']
         self.type = self.canvas_data['type']
         self.thumbnail = self.__find_thumbnail_source()
         self.parent_title = self.canvas_data['title']
         self.as_dict = self.__build_dict()
+
+    @staticmethod
+    def get_sequence(value):
+        try:
+            return int(value)
+        except ValueError:
+            return 1
 
     def __find_canvas_artists(self):
         artists = []

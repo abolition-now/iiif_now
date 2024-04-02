@@ -1,0 +1,1 @@
+from .navplace import NavPlace

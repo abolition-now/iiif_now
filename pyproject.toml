@@ -10,7 +10,11 @@ readme = "README.md"
 python = "^3.12"
 requests = "^2.31.0"
 iiif-prezi3 = "^1.2.1"
+pyyaml = "^6.0.1"
+click = "^8.1.7"
 
+[tool.poetry.scripts]
+iiifnow = "iiif_now.iiifnow:cli"
 
 [build-system]
 requires = ["poetry-core"]

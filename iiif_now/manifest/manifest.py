@@ -2,10 +2,11 @@ from iiif_prezi3 import Manifest, config, KeyValueString, load_bundled_extension
 import requests
 import json
 from iiif_now.navplace import NavPlace
+from iiif_now.thumbnail import Thumbnail
 
 
 class ANManifest:
-    # @Todo: Add navPlace
+    # @Todo: Reduce requests by adding thumbnails to manifest.
     def __init__(
             self,
             manifest_data,
@@ -47,20 +48,22 @@ class ANManifest:
                 metadata=self.metadata
             )
         for canvas in self.manifest_data['canvases']:
+            # @Todo: Add canvas metadata to canvas.
             if canvas['type'] == 'Image':
                 try:
                     # @Todo: Protect anno page and annotation
+                    thumbnail = Thumbnail(f"{self.image_server_path}{canvas['key']}").get()
                     manifest.make_canvas_from_iiif(
                         url=f"{self.image_server_path}{canvas['key']}",
                         label=canvas['label'] if canvas['label'] != "" else "Untitled",
                         id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
                         anno_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1",
                         anno_page_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1/page/1",
+                        thumbnail=thumbnail
                     )
                 except requests.HTTPError as e:
                     print(f'{e}. Missing file in bucket or other image server problem.')
             elif canvas['type'] == 'Video':
-                # try:
                 vid_canvas = manifest.make_canvas(
                     id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
                     label=canvas['label'] if canvas['label'] != "" else "Untitled",
@@ -75,7 +78,6 @@ class ANManifest:
         manifest_as_json = json.loads(x)
         manifest_as_json['@context'] = ["http://iiif.io/api/extension/navplace/context.json", "http://iiif.io/api/presentation/3/context.json"]
         return manifest_as_json
-
 
     def __find_features(self):
         all_features = []

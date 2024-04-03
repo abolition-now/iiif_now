@@ -4,7 +4,8 @@
 
 ### Features
 
-* Add artists to metadata.
+* Added artists to metadata.
+* Added thumbnails to image canvases.
 
 ### Bug Fixes
 

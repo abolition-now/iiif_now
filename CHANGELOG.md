@@ -4,6 +4,8 @@
 
 ### Features
 
+* Add artists to metadata.
+
 ### Bug Fixes
 
 * Made sure codes are not repeated in parent manifests.

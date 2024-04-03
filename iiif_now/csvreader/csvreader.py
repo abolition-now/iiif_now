@@ -71,9 +71,11 @@ class DataReader:
             if canvas.parent_title != '':
                 canvas_dict['manifest_title'] = canvas.parent_title
             canvas_dict['canvases'].append(canvas.as_dict)
+            # @Todo: Does this need to be here with below?
             for artist in canvas.artists:
                 if artist not in canvas_dict['artists']:
                     canvas_dict['artists'].append(artist)
+            # @Todo: Break this into separate method
             if canvas.metadata:
                 for k, v in canvas.metadata.items():
                     if k not in canvas_dict['metadata']:
@@ -82,6 +84,15 @@ class DataReader:
                         for value in v:
                             if value not in canvas_dict['metadata'][k]:
                                 canvas_dict['metadata'][k].append(value)
+            # @Todo: Break this into separate method
+            # Add artists to metadata if not already present
+            if len(canvas_dict['artists']) > 0:
+                if 'Artist' not in canvas_dict['metadata']:
+                    canvas_dict['metadata']['Artist'] = canvas_dict['artists']
+                else:
+                    for artist in canvas_dict['artists']:
+                        if artist not in canvas_dict['metadata']['Artist']:
+                            canvas_dict['metadata']['Artist'].append(artist)
         for canvas_dict in hierarchy:
             canvas_dict['canvases'] = sorted(canvas_dict['canvases'], key=lambda x: int(x['sequence']))
         return hierarchy

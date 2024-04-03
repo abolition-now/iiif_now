@@ -4,6 +4,8 @@
 
 IIIF Manifest generation tools for the Abolition Now project.
 
+![Example Manifest](manifest_example.png "Example Manifest")
+
 ## Installation
 
 ```bash

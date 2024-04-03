@@ -79,7 +79,9 @@ class DataReader:
                     if k not in canvas_dict['metadata']:
                         canvas_dict['metadata'][k] = v
                     else:
-                        canvas_dict['metadata'][k].extend(v)
+                        for value in v:
+                            if value not in canvas_dict['metadata'][k]:
+                                canvas_dict['metadata'][k].append(value)
         for canvas_dict in hierarchy:
             canvas_dict['canvases'] = sorted(canvas_dict['canvases'], key=lambda x: int(x['sequence']))
         return hierarchy

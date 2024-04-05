@@ -41,7 +41,7 @@ class NavPlace:
             try:
                 features.append(
                     {
-                        "id": f"{self.parent_uri}/notdereferenceable/feature/{i}",
+                        "id": f"{self.parent_uri}notdereferenceable/feature/{i}",
                         "type": "Feature",
                         "properties": {
                             "label": {

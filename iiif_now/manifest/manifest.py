@@ -6,13 +6,12 @@ from iiif_now.thumbnail import Thumbnail
 
 
 class ANManifest:
-    # @Todo: Reduce requests by adding thumbnails to manifest.
     def __init__(
             self,
             manifest_data,
             image_server_path="https://strob6zro3bzklrulaqu2545sy0odbvz.lambda-url.us-east-2.on.aws/iiif/3/",
             video_location="https://digital.lib.utk.edu/static/",
-            manifest_bucket="https://aboltion-now-manifests.s3.us-east-2.amazonaws.com/",
+            manifest_bucket="https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/",
             extensions=[]
     ):
         self.config = config.configs['helpers.auto_fields.AutoLang'].auto_lang = "en"
@@ -29,7 +28,6 @@ class ANManifest:
 
     def __build_manifest(self):
         # @Todo: Clean up this method.  It's a mess and doing too much.
-        # @Todo: manifest.id should be set in config and passed here as a variable.
         if self.features:
             navplace_data = NavPlace(
                 self.features,
@@ -37,14 +35,14 @@ class ANManifest:
                 self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled"
             ).features
             manifest = Manifest(
-                id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
+                id=f"{self.manifest_bucket}{self.manifest_data['id']}.json",
                 label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
                 metadata=self.metadata,
                 navPlace={"features": navplace_data}
             )
         else:
             manifest = Manifest(
-                id=f"https://raw.githubusercontent.com/markpbaggett/static_iiif/main/manifests/abolition_now/{self.manifest_data['id']}.json",
+                id=f"{self.manifest_bucket}{self.manifest_data['id']}.json",
                 label=self.manifest_data['manifest_title'] if self.manifest_data[
                                                                   'manifest_title'] != "" else "Untitled",
                 metadata=self.metadata
@@ -66,7 +64,6 @@ class ANManifest:
                 except requests.HTTPError as e:
                     print(f'{e}. Missing file in bucket or other image server problem.')
             elif canvas['type'] == 'Video':
-                # @Todo: Add a thumbnail for videos.
                 vid_canvas = manifest.make_canvas(
                     id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
                     label=canvas['label'] if canvas['label'] != "" else "Untitled",
@@ -117,7 +114,6 @@ class ANManifest:
             )
 
     def __create_video_canvas(self, canvas, canvas_data):
-        # @Todo: Check for video file like we do for images.
         anno_body = ResourceItem(
             id=f"{self.video_location}{canvas_data['key']}",
             type="Video",

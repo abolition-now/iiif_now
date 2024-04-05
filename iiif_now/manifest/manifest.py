@@ -19,7 +19,7 @@ class ANManifest:
         self.manifest_bucket = manifest_bucket
         self.video_location = video_location
         self.manifest_data = manifest_data
-        self.metadata = self.__build_metadata()
+        self.metadata = self.__build_metadata(manifest_data['metadata'])
         self.features = self.__find_features()
         self.manifest = self.__build_manifest()
         self.extensions = load_bundled_extensions(
@@ -48,7 +48,6 @@ class ANManifest:
                 metadata=self.metadata
             )
         for canvas in self.manifest_data['canvases']:
-            # @Todo: Add canvas metadata to canvas.
             thumbnail = Thumbnail(f"{self.image_server_path}{canvas['thumbnail']}").get()
             if canvas['type'] == 'Image':
                 try:
@@ -59,7 +58,8 @@ class ANManifest:
                         id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
                         anno_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1",
                         anno_page_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/annotation/1/page/1",
-                        thumbnail=thumbnail
+                        thumbnail=thumbnail,
+                        metadata=self.__build_metadata(canvas.get('metadata'))
                     )
                 except requests.HTTPError as e:
                     print(f'{e}. Missing file in bucket or other image server problem.')
@@ -67,7 +67,8 @@ class ANManifest:
                 vid_canvas = manifest.make_canvas(
                     id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
                     label=canvas['label'] if canvas['label'] != "" else "Untitled",
-                    thumbnail=thumbnail
+                    thumbnail=thumbnail,
+                    metadata=self.__build_metadata(canvas.get('metadata'))
                 )
                 details = self.__create_video_canvas(
                     canvas=vid_canvas,
@@ -88,9 +89,10 @@ class ANManifest:
                     all_features.append(feature)
         return all_features
 
-    def __build_metadata(self):
+    @staticmethod
+    def __build_metadata(metadata_values):
         metadata = []
-        for k, v in self.manifest_data['metadata'].items():
+        for k, v in metadata_values.items():
             metadata.append(
                 KeyValueString(
                     label=k,

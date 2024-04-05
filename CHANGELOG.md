@@ -2,9 +2,18 @@
 
 ## [0.1.4] - 2024-04-05
 
+### Features
+
+* Canvases now have metadata.
+
 ### Bug Fixes
 
-* Both video an image canvases get thumbnails.
+* Thumbnails: Both video an image canvases get thumbnails.
+* navPlace: If location unknown, print error and pass.
+
+### Minor Changes
+
+* Manifests: Got rid of all hard-coded URIs.
 
 ## [0.1.3] - 2024-04-03
 

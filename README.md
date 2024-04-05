@@ -4,7 +4,7 @@
 
 IIIF Manifest generation tools for the Abolition Now project.
 
-![Example Manifest](manifest_example.png "Example Manifest")
+![Example Manifest](https://github.com/abolition-now/iiif_now/blob/main/manifest_example.png?raw=true "Example Manifest")
 
 ## Installation
 

@@ -38,25 +38,28 @@ class NavPlace:
         features = []
         i = 0
         for feature in self.features:
-            features.append(
-                {
-                    "id": f"{self.parent_uri}/notdereferenceable/feature/{i}",
-                    "type": "Feature",
-                    "properties": {
-                        "label": {
-                            "en": [
-                                f"{self.title} -- {feature}"
+            try:
+                features.append(
+                    {
+                        "id": f"{self.parent_uri}/notdereferenceable/feature/{i}",
+                        "type": "Feature",
+                        "properties": {
+                            "label": {
+                                "en": [
+                                    f"{self.title} -- {feature}"
+                                ]
+                            }
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                self.all_locations[feature][1],
+                                self.all_locations[feature][0]
                             ]
                         }
-                    },
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            self.all_locations[feature][1],
-                            self.all_locations[feature][0]
-                        ]
                     }
-                }
-            )
-            i += 1
+                )
+                i += 1
+            except KeyError:
+                print(f"Feature {feature} not found in locations. Add.")
         return features

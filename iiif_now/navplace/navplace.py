@@ -31,6 +31,7 @@ class NavPlace:
             "Boston": [42.3601, -71.0589],
             "Durham": [35.9940, -78.8986],
             "Turtle Island": [36.7783, -119.4179],
+            "Colombia": [4.7110, -74.0721]
         }
 
     def __add_navplace_features(self):

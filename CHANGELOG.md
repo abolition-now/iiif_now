@@ -1,5 +1,11 @@
 # Changes
 
+## [0.1.4] - 2024-04-05
+
+### Bug Fixes
+
+* Both video an image canvases get thumbnails.
+
 ## [0.1.3] - 2024-04-03
 
 ### Features

@@ -28,6 +28,8 @@ class ANManifest:
         )
 
     def __build_manifest(self):
+        # @Todo: Clean up this method.  It's a mess and doing too much.
+        # @Todo: manifest.id should be set in config and passed here as a variable.
         if self.features:
             navplace_data = NavPlace(
                 self.features,
@@ -49,10 +51,10 @@ class ANManifest:
             )
         for canvas in self.manifest_data['canvases']:
             # @Todo: Add canvas metadata to canvas.
+            thumbnail = Thumbnail(f"{self.image_server_path}{canvas['thumbnail']}").get()
             if canvas['type'] == 'Image':
                 try:
                     # @Todo: Protect anno page and annotation
-                    thumbnail = Thumbnail(f"{self.image_server_path}{canvas['key']}").get()
                     manifest.make_canvas_from_iiif(
                         url=f"{self.image_server_path}{canvas['key']}",
                         label=canvas['label'] if canvas['label'] != "" else "Untitled",
@@ -64,9 +66,11 @@ class ANManifest:
                 except requests.HTTPError as e:
                     print(f'{e}. Missing file in bucket or other image server problem.')
             elif canvas['type'] == 'Video':
+                # @Todo: Add a thumbnail for videos.
                 vid_canvas = manifest.make_canvas(
                     id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
                     label=canvas['label'] if canvas['label'] != "" else "Untitled",
+                    thumbnail=thumbnail
                 )
                 details = self.__create_video_canvas(
                     canvas=vid_canvas,

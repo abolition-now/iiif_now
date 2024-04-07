@@ -32,6 +32,7 @@ class ANManifest:
         homepage = HomePage(
             self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled"
         ).body
+        rights = "http://rightsstatements.org/vocab/InC/1.0/"
         if self.features:
             navplace_data = NavPlace(
                 self.features,
@@ -43,7 +44,8 @@ class ANManifest:
                 label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
                 metadata=self.metadata,
                 navPlace={"features": navplace_data},
-                homepage=[homepage]
+                homepage=[homepage],
+                rights=rights
             )
         else:
             manifest = Manifest(
@@ -51,7 +53,8 @@ class ANManifest:
                 label=self.manifest_data['manifest_title'] if self.manifest_data[
                                                                   'manifest_title'] != "" else "Untitled",
                 metadata=self.metadata,
-                homepage=[homepage]
+                homepage=[homepage],
+                rights=rights
             )
         for canvas in self.manifest_data['canvases']:
             thumbnail = Thumbnail(f"{self.image_server_path}{canvas['thumbnail']}").get()

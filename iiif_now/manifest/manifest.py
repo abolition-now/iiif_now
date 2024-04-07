@@ -3,6 +3,7 @@ import requests
 import json
 from iiif_now.homepage import HomePage
 from iiif_now.navplace import NavPlace
+from iiif_now.study_guide import StudyGuide
 from iiif_now.thumbnail import Thumbnail
 
 
@@ -32,6 +33,7 @@ class ANManifest:
         homepage = HomePage(
             self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled"
         ).body
+        rendering = StudyGuide(self.manifest_data['metadata']['Artist']).body
         rights = "http://rightsstatements.org/vocab/InC/1.0/"
         if self.features:
             navplace_data = NavPlace(
@@ -45,7 +47,8 @@ class ANManifest:
                 metadata=self.metadata,
                 navPlace={"features": navplace_data},
                 homepage=[homepage],
-                rights=rights
+                rights=rights,
+                rendering=rendering
             )
         else:
             manifest = Manifest(
@@ -54,7 +57,8 @@ class ANManifest:
                                                                   'manifest_title'] != "" else "Untitled",
                 metadata=self.metadata,
                 homepage=[homepage],
-                rights=rights
+                rights=rights,
+                rendering=rendering
             )
         for canvas in self.manifest_data['canvases']:
             thumbnail = Thumbnail(f"{self.image_server_path}{canvas['thumbnail']}").get()

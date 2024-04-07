@@ -1,6 +1,7 @@
 from iiif_prezi3 import Manifest, config, KeyValueString, load_bundled_extensions, AnnotationPage, Annotation, ResourceItem
 import requests
 import json
+from iiif_now.homepage import HomePage
 from iiif_now.navplace import NavPlace
 from iiif_now.thumbnail import Thumbnail
 
@@ -28,6 +29,9 @@ class ANManifest:
 
     def __build_manifest(self):
         # @Todo: Clean up this method.  It's a mess and doing too much.
+        homepage = HomePage(
+            self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled"
+        ).body
         if self.features:
             navplace_data = NavPlace(
                 self.features,
@@ -38,14 +42,16 @@ class ANManifest:
                 id=f"{self.manifest_bucket}{self.manifest_data['id']}.json",
                 label=self.manifest_data['manifest_title'] if self.manifest_data['manifest_title'] != "" else "Untitled",
                 metadata=self.metadata,
-                navPlace={"features": navplace_data}
+                navPlace={"features": navplace_data},
+                homepage=[homepage]
             )
         else:
             manifest = Manifest(
                 id=f"{self.manifest_bucket}{self.manifest_data['id']}.json",
                 label=self.manifest_data['manifest_title'] if self.manifest_data[
                                                                   'manifest_title'] != "" else "Untitled",
-                metadata=self.metadata
+                metadata=self.metadata,
+                homepage=[homepage]
             )
         for canvas in self.manifest_data['canvases']:
             thumbnail = Thumbnail(f"{self.image_server_path}{canvas['thumbnail']}").get()

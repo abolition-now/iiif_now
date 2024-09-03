@@ -76,6 +76,9 @@ class ANManifest:
                     )
                 except requests.HTTPError as e:
                     print(f'{e}. Missing file in bucket or other image server problem.')
+                    error_message = str(e)
+                    with open('errors.log', 'a') as f:
+                        f.write(f'{error_message.split(" ")[-1]}\n')
             elif canvas['type'] == 'Video':
                 vid_canvas = manifest.make_canvas(
                     id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}",
@@ -89,6 +92,23 @@ class ANManifest:
                 )
                 vid_canvas.set_hwd(**details[1])
                 vid_canvas.add_item(details[0])
+                anno = vid_canvas.make_annotation(
+                    id=f"{self.manifest_bucket}{canvas['key']}/canvas/caption/{canvas['sequence']}",
+                    motivation="supplementing",
+                    body={
+                        "id": f"{self.manifest_bucket.replace("manifests/manifests/", "manifests/captions/")}{self.manifest_data['id']}_oo_base.vtt",
+                        "type": "Text",
+                        "language": "en",
+                        "format": "text/vtt",
+                        "label": {
+                            "en": [
+                                "Captions in English"
+                            ]
+                        }
+                    },
+                    target=f"{self.manifest_bucket}{canvas['key']}/canvas/caption/{canvas['sequence']}",
+                    anno_page_id=f"{self.manifest_bucket}{canvas['key']}/canvas/{canvas['sequence']}/caption/annotation/1/page/1"
+                )
         x = manifest.json(indent=2)
         manifest_as_json = json.loads(x)
         manifest_as_json['@context'] = ["http://iiif.io/api/extension/navplace/context.json", "http://iiif.io/api/presentation/3/context.json"]
@@ -143,7 +163,7 @@ class ANManifest:
             body=anno_body,
             target=canvas.id
         )
-        hwd = {"height": 360, "width": 480, "duration": canvas_data['duration']}
+        hwd = {"height": 1080, "width": 1920, "duration": canvas_data['duration']}
         anno_body.set_hwd(**hwd)
         anno_page.add_item(anno)
         return anno_page, hwd

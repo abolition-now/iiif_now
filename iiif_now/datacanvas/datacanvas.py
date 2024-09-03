@@ -1,5 +1,6 @@
 from csv import DictReader
 
+
 class DataCanvas:
     def __init__(self, canvas_data, artists_data, metadata_data):
         self.canvas_data = canvas_data
@@ -24,7 +25,7 @@ class DataCanvas:
 
     def __find_canvas_artists(self):
         artists = []
-        split_key =  self.canvas_data['key'].split('_')
+        split_key = self.canvas_data['key'].split('_')
         for value in split_key:
             if value in self.artists_data:
                 artists.append(self.artists_data[value])

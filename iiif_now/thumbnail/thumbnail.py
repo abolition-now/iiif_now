@@ -13,6 +13,8 @@ class Thumbnail:
             return r['sizes'][-3]
         except requests.exceptions.JSONDecodeError:
             return {'width': 100, 'height': 100}
+        except IndexError:
+            return r['sizes'][-1]
 
     def get(self):
         resource = ResourceItem(
